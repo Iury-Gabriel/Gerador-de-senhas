@@ -2,25 +2,34 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
-  const [passwordLength, setPasswordLength] = useState(1);
+  const [passwordLength, setPasswordLength] = useState(8);
   const [includeLowerCase, setIncludeLowerCase] = useState(true);
-  const [includeUpperCase, setIncludeUpperCase] = useState(false);
-  const [includeNumbers, setIncludeNumbers] = useState(false);
-  const [includeSymbols, setIncludeSymbols] = useState(false);
+  const [includeUpperCase, setIncludeUpperCase] = useState(true);
+  const [includeNumbers, setIncludeNumbers] = useState(true);
+  const [includeSymbols, setIncludeSymbols] = useState(true);
 
   const [password, setPassword] = useState('');
+  const [isValidPassword, setIsValidPassword] = useState(true);
 
   const handleGeneratePassword = () => {
     let charList = '';
     if (includeLowerCase) charList += 'abcdefghijklmnopqrstuvwxyz';
     if (includeUpperCase) charList += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     if (includeNumbers) charList += '0123456789';
-    if (includeSymbols) charList += '!@#$%^&*()_+~<>?';
-    let password = '';
+    if (includeSymbols) charList += '!@#$&*()_+~<>';
+
+    let generatedPassword = '';
     for (let i = 0; i < passwordLength; i++) {
-      password += charList.charAt(Math.floor(Math.random() * charList.length));
+      generatedPassword += charList.charAt(Math.floor(Math.random() * charList.length));
     }
-    setPassword(password);
+
+    setPassword(generatedPassword);
+    validatePassword(generatedPassword);
+  };
+
+  const validatePassword = (password: string) => {
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{8,}$/;
+    setIsValidPassword(passwordRegex.test(password));
   };
 
   const handleCopyPassword = () => {
@@ -36,12 +45,12 @@ function App() {
     <div className='app'>
       <div className='container'>
         <h1>Gerador de senhas</h1>
-        <div className={`passwordArea ${password.length > 20 ? 'longPassword' : ''}`}>
+        <div className={`passwordArea ${isValidPassword ? '' : 'invalidPassword'}`}>
           <p>{password}</p>
         </div>
         <div className="checks">
           <div className="length">
-            <input type="range" name="length" id="" min="1" max="50" value={passwordLength} onChange={(e) => setPasswordLength(Number(e.target.value))} />
+            <input type="range" name="length" id="" min="8" max="50" value={passwordLength} onChange={(e) => setPasswordLength(Number(e.target.value))} />
             <label htmlFor="length">{passwordLength}</label>
           </div>
           <div className="LowerCase">
